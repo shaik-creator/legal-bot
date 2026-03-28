@@ -1,0 +1,39 @@
+# Frontend dependencies
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/.eslintcache
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+# Backend dependencies and environment
+backend/__pycache__/
+backend/*.py[cod]
+backend/*$py.class
+backend/.pytest_cache/
+backend/.venv/
+backend/venv/
+backend/env/
+.venv/
+venv/
+
+# Environment Variables (CRITICAL: Never upload your API Keys to the internet)
+backend/.env
+.env
+.env.local
+.env.*
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
