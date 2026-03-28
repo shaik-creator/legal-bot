@@ -150,87 +150,6 @@ export default function OutputDashboard({ file, lang, apiData, onReset }) {
               </div>
             </div>
 
-            {/* Chat Box */}
-            {showChat && (
-              <div style={{
-                background: "#fff", borderRadius: 16,
-                border: "1px solid #E2E8F0",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
-                overflow: "hidden", animation: "fadeSlideUp 0.4s ease",
-              }}>
-                <div style={{
-                  padding: "16px 20px", borderBottom: "1px solid #F1F5F9",
-                  background: "#FAFBFF",
-                }}>
-                  <h3 style={{
-                    fontFamily: "'Playfair Display', Georgia, serif",
-                    fontWeight: 700, fontSize: 17, color: "#0F172A",
-                    display: "flex", gap: 8, alignItems: "center",
-                  }}>
-                    💬 Ask About Your Document
-                  </h3>
-                </div>
-                <div style={{ padding: "16px 20px", maxHeight: 320, overflowY: "auto" }}>
-                  {chatMessages.map((m, i) => (
-                    <div key={i} style={{
-                      display: "flex",
-                      justifyContent: m.role === "user" ? "flex-end" : "flex-start",
-                      marginBottom: 12,
-                    }}>
-                      {m.role === "ai" && (
-                        <div style={{
-                          width: 28, height: 28, borderRadius: "50%",
-                          background: "#EFF6FF", display: "flex", alignItems: "center",
-                          justifyContent: "center", fontSize: 14, flexShrink: 0,
-                          marginRight: 8, marginTop: 2,
-                        }}>
-                          ⚖️
-                        </div>
-                      )}
-                      <div style={{
-                        maxWidth: "75%", padding: "10px 14px",
-                        borderRadius: m.role === "user"
-                          ? "14px 14px 4px 14px"
-                          : "14px 14px 14px 4px",
-                        background: m.role === "user" ? "#2563EB" : "#F8FAFC",
-                        border: m.role === "ai" ? "1px solid #E2E8F0" : "none",
-                        fontSize: 14,
-                        color: m.role === "user" ? "#fff" : "#374151",
-                        fontFamily: "Georgia, serif", lineHeight: 1.5,
-                      }}>
-                        {m.text}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div style={{
-                  padding: "12px 16px", borderTop: "1px solid #F1F5F9",
-                  display: "flex", gap: 10,
-                }}>
-                  <input
-                    value={chatInput}
-                    onChange={e => setChatInput(e.target.value)}
-                    onKeyDown={e => e.key === "Enter" && sendChat()}
-                    placeholder="Ask something about your document…"
-                    style={{
-                      flex: 1, padding: "10px 14px", borderRadius: 10,
-                      border: "1px solid #E2E8F0", fontSize: 14,
-                      fontFamily: "Georgia, serif", outline: "none", color: "#374151",
-                    }}
-                  />
-                  <button
-                    onClick={sendChat}
-                    style={{
-                      padding: "10px 16px", borderRadius: 10,
-                      background: "#2563EB", color: "#fff",
-                      border: "none", cursor: "pointer", fontSize: 16,
-                    }}
-                  >
-                    ➤
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Right panel — Action Checklist */}
@@ -238,6 +157,90 @@ export default function OutputDashboard({ file, lang, apiData, onReset }) {
             <ActionChecklistPanel actions={actions} />
           )}
         </div>
+
+        {/* Floating Chat Box */}
+        {showChat && (
+          <div style={{
+            position: "fixed", bottom: 24, right: 24, zIndex: 100,
+            width: 380, height: 500,
+            background: "#fff", borderRadius: 20,
+            border: "1px solid #E2E8F0",
+            boxShadow: "0 10px 40px rgba(0,0,0,0.15)",
+            display: "flex", flexDirection: "column",
+            overflow: "hidden", animation: "fadeSlideUp 0.3s ease",
+          }}>
+            <div style={{
+              padding: "16px 20px", background: "linear-gradient(135deg, #1E293B 0%, #0F172A 100%)",
+              display: "flex", justifyContent: "space-between", alignItems: "center",
+            }}>
+              <h3 style={{
+                fontFamily: "'Playfair Display', Georgia, serif",
+                fontWeight: 700, fontSize: 18, color: "#fff",
+                display: "flex", gap: 8, alignItems: "center", margin: 0
+              }}>
+                💬 NyayBot Chat
+              </h3>
+              <button 
+                onClick={() => setShowChat(false)}
+                style={{ background: "none", border: "none", color: "#94A3B8", fontSize: 20, cursor: "pointer" }}
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div style={{ padding: "16px", flex: 1, overflowY: "auto", background: "#F8FAFC" }}>
+              {chatMessages.map((m, i) => (
+                <div key={i} style={{
+                  display: "flex", flexDirection: "column",
+                  alignItems: m.role === "user" ? "flex-end" : "flex-start",
+                  marginBottom: 16,
+                }}>
+                  <div style={{
+                    maxWidth: "85%", padding: "12px 16px",
+                    borderRadius: m.role === "user" ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
+                    background: m.role === "user" ? "#2563EB" : "#fff",
+                    border: m.role === "ai" ? "1px solid #E2E8F0" : "none",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+                    fontSize: 14,
+                    color: m.role === "user" ? "#fff" : "#1E293B",
+                    fontFamily: "Georgia, serif", lineHeight: 1.6,
+                  }}>
+                    {m.text}
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <div style={{
+              padding: "16px", background: "#fff", borderTop: "1px solid #E2E8F0",
+              display: "flex", gap: 10,
+            }}>
+              <input
+                value={chatInput}
+                onChange={e => setChatInput(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && sendChat()}
+                placeholder="Ask a legal question..."
+                style={{
+                  flex: 1, padding: "10px 14px", borderRadius: 10,
+                  border: "1px solid #CBD5E1", fontSize: 14,
+                  fontFamily: "Georgia, serif", outline: "none", color: "#1E293B",
+                  background: "#F8FAFC",
+                }}
+              />
+              <button
+                onClick={sendChat}
+                style={{
+                  padding: "10px 16px", borderRadius: 10,
+                  background: "#2563EB", color: "#fff",
+                  border: "none", cursor: "pointer", fontSize: 16,
+                  boxShadow: "0 2px 8px rgba(37,99,235,0.3)",
+                }}
+              >
+                ➤
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

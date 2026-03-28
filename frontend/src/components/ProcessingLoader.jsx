@@ -26,10 +26,13 @@ export default function ProcessingLoader({ file, lang, onDone }) {
       formData.append("language", languageName);
 
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
+        const apiUrl = "https://real-zebras-sink.loca.lt";
         const res = await fetch(`${apiUrl}/process`, {
           method: "POST",
           body: formData,
+          headers: {
+            "Bypass-Tunnel-Reminder": "true",
+          }
         });
 
         if (!res.ok) {
