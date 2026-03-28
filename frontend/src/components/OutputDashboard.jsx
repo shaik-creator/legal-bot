@@ -9,7 +9,38 @@ export default function OutputDashboard({ file, lang, apiData, onReset }) {
     { role: "ai", text: "Hi! I've analyzed your document. What would you like to know?" },
   ]);
   const [chatInput, setChatInput] = useState("");
+  const [isSpeaking, setIsSpeaking] = useState(false);
+
   const selectedLang = LANGUAGES.find(l => l.code === lang);
+
+  // Free Native Voice Assistant (TTS)
+  const toggleSpeech = (textToSpeak) => {
+    if (!("speechSynthesis" in window)) {
+      alert("Your browser does not support the Voice Assistant feature.");
+      return;
+    }
+    const synth = window.speechSynthesis;
+    
+    // Stop speaking if already speaking
+    if (isSpeaking || synth.speaking) {
+      synth.cancel();
+      setIsSpeaking(false);
+      return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+    // Map our lang codes to BCP 47 codes
+    const langMap = { hi:"hi-IN", te:"te-IN", ta:"ta-IN", kn:"kn-IN", bn:"bn-IN", mr:"mr-IN", gu:"gu-IN", ml:"ml-IN", en:"en-US" };
+    utterance.lang = langMap[lang] || "hi-IN"; // default to Hindi if code matches Indian language
+    utterance.rate = 0.9; // Slightly slower for legal clarity
+    utterance.volume = 1;
+
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+
+    synth.speak(utterance);
+    setIsSpeaking(true);
+  };
 
   const sendChat = () => {
     if (!chatInput.trim()) return;
@@ -91,12 +122,55 @@ export default function OutputDashboard({ file, lang, apiData, onReset }) {
 
       {/* Content */}
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "24px 24px 0" }}>
-        {/* Summary Card */}
+        {/* Glassmorphic Summary Card */}
         <div style={{
-          background: "linear-gradient(135deg, #1D4ED8 0%, #2563EB 100%)",
-          borderRadius: 20, padding: "24px 28px", marginBottom: 24, color: "#fff",
-          boxShadow: "0 4px 24px rgba(37,99,235,0.25)", animation: "fadeSlideUp 0.5s ease",
+          background: "linear-gradient(135deg, rgba(37,99,235,0.95) 0%, rgba(29,78,216,0.95) 100%)",
+          backdropFilter: "blur(12px)",
+          borderRadius: 24, padding: "28px 32px", marginBottom: 32, color: "#fff",
+          border: "1px solid rgba(255,255,255,0.2)",
+          boxShadow: "0 10px 40px rgba(37,99,235,0.3)", animation: "fadeSlideUp 0.5s ease",
         }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
+            <div style={{ display: "flex", gap: 16 }}>
+              <div style={{
+                 background: "rgba(255,255,255,0.15)", width: 48, height: 48, 
+                 borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 
+              }}>
+                📋
+              </div>
+              <div>
+                <p style={{
+                  fontFamily: "'Playfair Display', Georgia, serif",
+                  fontWeight: 800, fontSize: 22, marginBottom: 12, letterSpacing: "-0.5px"
+                }}>
+                  Document Summary
+                </p>
+                <p style={{
+                  fontSize: 16, lineHeight: 1.8, color: "#DBEAFE",
+                  fontFamily: "Georgia, serif", maxWidth: "90%"
+                }}>
+                  {summary}
+                </p>
+              </div>
+            </div>
+            {/* Voice Assistant Play Button */}
+            <button
+              onClick={() => toggleSpeech(summary)}
+              className={isSpeaking ? "pulse-animation" : ""}
+              style={{
+                display: "flex", alignItems: "center", gap: 8,
+                background: isSpeaking ? "#DCFCE7" : "rgba(255,255,255,0.15)",
+                color: isSpeaking ? "#166534" : "#fff",
+                border: "1px solid rgba(255,255,255,0.3)",
+                padding: "10px 20px", borderRadius: 100,
+                cursor: "pointer", fontWeight: 600, fontSize: 13,
+                transition: "all 0.3s", flexShrink: 0
+              }}
+            >
+              {isSpeaking ? "🛑 Stop Listening" : "🔊 Listen"}
+            </button>
+          </div>
+        </div>
           <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
             <span style={{ fontSize: 24 }}>📋</span>
             <div>
@@ -121,21 +195,33 @@ export default function OutputDashboard({ file, lang, apiData, onReset }) {
           gridTemplateColumns: actions.length > 0 ? "1fr 380px" : "1fr",
           gap: 20, alignItems: "start",
         }}>
-          {/* Left panel — Simplified Content */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+            {/* Left panel — Simplified Content (Glass Card) */}
             <div style={{
-              background: "#fff", borderRadius: 16, padding: 24,
-              border: "1px solid #E2E8F0",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+              background: "rgba(255, 255, 255, 0.7)", backdropFilter: "blur(16px)",
+              borderRadius: 24, padding: 32,
+              border: "1px solid rgba(255,255,255,0.8)",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.05)",
               animation: "fadeSlideUp 0.6s ease",
             }}>
-              <h3 style={{
-                fontFamily: "'Playfair Display', Georgia, serif",
-                fontWeight: 700, fontSize: 18, color: "#0F172A",
-                marginBottom: 16, display: "flex", gap: 10, alignItems: "center",
-              }}>
-                <span>📖</span> Simplified Content
-              </h3>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                <h3 style={{
+                  fontFamily: "'Playfair Display', Georgia, serif",
+                  fontWeight: 800, fontSize: 22, color: "#0F172A",
+                  display: "flex", gap: 10, alignItems: "center",
+                }}>
+                  <span>📖</span> Detailed Explanation
+                </h3>
+                <button
+                  onClick={() => toggleSpeech(content)}
+                  style={{
+                    background: "#EFF6FF", color: "#2563EB", border: "1px solid #BFDBFE",
+                    padding: "8px 16px", borderRadius: 100, fontSize: 12, fontWeight: 700,
+                    cursor: "pointer", display: "flex", alignItems: "center", gap: 6,
+                  }}
+                >
+                  🔊 Read Full Document
+                </button>
+              </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                 {contentParagraphs.map((para, i) => (
                   <p key={i} style={{
@@ -158,19 +244,19 @@ export default function OutputDashboard({ file, lang, apiData, onReset }) {
           )}
         </div>
 
-        {/* Floating Chat Box */}
+        {/* Floating Chat Box (Glassmorphic) */}
         {showChat && (
           <div style={{
             position: "fixed", bottom: 24, right: 24, zIndex: 100,
             width: 380, height: 500,
-            background: "#fff", borderRadius: 20,
-            border: "1px solid #E2E8F0",
-            boxShadow: "0 10px 40px rgba(0,0,0,0.15)",
+            background: "rgba(255, 255, 255, 0.9)", backdropFilter: "blur(20px)",
+            borderRadius: 24, border: "1px solid rgba(255,255,255,0.5)",
+            boxShadow: "0 20px 40px rgba(0,0,0,0.2)",
             display: "flex", flexDirection: "column",
-            overflow: "hidden", animation: "fadeSlideUp 0.3s ease",
+            overflow: "hidden", animation: "fadeSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
           }}>
             <div style={{
-              padding: "16px 20px", background: "linear-gradient(135deg, #1E293B 0%, #0F172A 100%)",
+              padding: "18px 24px", background: "linear-gradient(135deg, #0F172A 0%, #1E293B 100%)",
               display: "flex", justifyContent: "space-between", alignItems: "center",
             }}>
               <h3 style={{
@@ -178,7 +264,7 @@ export default function OutputDashboard({ file, lang, apiData, onReset }) {
                 fontWeight: 700, fontSize: 18, color: "#fff",
                 display: "flex", gap: 8, alignItems: "center", margin: 0
               }}>
-                💬 NyayBot Chat
+                <span className="pulse-indicator">🤖</span> NyayBot AI
               </h3>
               <button 
                 onClick={() => setShowChat(false)}
@@ -261,18 +347,19 @@ function ActionChecklistPanel({ actions }) {
 
   return (
     <div style={{
-      background: "#fff", borderRadius: 16, padding: 24,
-      border: "1px solid #E2E8F0",
-      boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+      background: "rgba(255, 255, 255, 0.7)", backdropFilter: "blur(16px)",
+      borderRadius: 24, padding: 32,
+      border: "1px solid rgba(255,255,255,0.8)",
+      boxShadow: "0 8px 32px rgba(0,0,0,0.05)",
       animation: "fadeSlideUp 0.7s ease",
       position: "sticky", top: 80,
     }}>
       <h3 style={{
         fontFamily: "'Playfair Display', Georgia, serif",
-        fontWeight: 700, fontSize: 18, color: "#0F172A",
-        marginBottom: 4, display: "flex", gap: 10, alignItems: "center",
+        fontWeight: 800, fontSize: 20, color: "#0F172A",
+        marginBottom: 8, display: "flex", gap: 10, alignItems: "center",
       }}>
-        <span>✅</span> What You Should Do
+        <span>🎯</span> Your Action Plan
       </h3>
       <p style={{ color: "#64748B", fontSize: 13, fontFamily: "Georgia, serif", marginBottom: 20 }}>
         {completedCount} of {items.length} steps completed
