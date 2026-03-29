@@ -171,24 +171,7 @@ export default function OutputDashboard({ file, lang, apiData, onReset }) {
             </button>
           </div>
         </div>
-          <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-            <span style={{ fontSize: 24 }}>📋</span>
-            <div>
-              <p style={{
-                fontFamily: "'Playfair Display', Georgia, serif",
-                fontWeight: 700, fontSize: 18, marginBottom: 10,
-              }}>
-                Document Summary
-              </p>
-              <p style={{
-                fontSize: 15, lineHeight: 1.7, color: "#BFDBFE",
-                fontFamily: "Georgia, serif",
-              }}>
-                {summary}
-              </p>
-            </div>
-          </div>
-        </div>
+
 
         <div style={{
           display: "grid",
@@ -235,8 +218,6 @@ export default function OutputDashboard({ file, lang, apiData, onReset }) {
                 ))}
               </div>
             </div>
-
-          </div>
 
           {/* Right panel — Action Checklist */}
           {actions.length > 0 && (

@@ -26,7 +26,7 @@ export default function ProcessingLoader({ file, lang, onDone }) {
       formData.append("language", languageName);
 
       try {
-        const apiUrl = "https://real-zebras-sink.loca.lt";
+        const apiUrl = "https://nyaybot-backend.onrender.com";
         const res = await fetch(`${apiUrl}/process`, {
           method: "POST",
           body: formData,
